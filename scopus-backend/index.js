@@ -11,7 +11,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
+const searchRoutes = require('./routes/search');
 
+app.use('/api/search', searchRoutes);
 // Rutas
 app.use('/api', researchProjectRoutes);
 app.use('/api/auth', authRoutes); // Rutas de autenticación
