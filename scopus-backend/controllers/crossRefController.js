@@ -3,17 +3,18 @@ const axios = require('axios');
 
 exports.searchCrossRef = async (req, res) => {
   const { searchType, query } = req.query;
-  let searchQuery;
 
+  // Dynamically set the CrossRef API parameter based on search type
+  let apiParam;
   switch (searchType) {
     case 'autor':
-      searchQuery = `query.author=${query}`;
+      apiParam = { 'query.author': query };
       break;
     case 'doi':
-      searchQuery = `query=${query}`;
+      apiParam = { query: query };
       break;
     case 'nombre':
-      searchQuery = `query.title=${query}`;
+      apiParam = { 'query.title': query };
       break;
     default:
       return res.status(400).json({ error: 'Tipo de búsqueda no válido' });
@@ -21,7 +22,7 @@ exports.searchCrossRef = async (req, res) => {
 
   try {
     const response = await axios.get('https://api.crossref.org/works', {
-      params: { [searchType === 'doi' ? 'query' : 'query.bibliographic']: query },
+      params: apiParam,
     });
     res.json(response.data.message.items);
   } catch (error) {

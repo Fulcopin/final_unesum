@@ -4,26 +4,26 @@ exports.searchScielo = async (req, res) => {
   const { searchType, query } = req.query;
   let url = '';
   let params = {
-    fmt: 'json', // Formato de salida
-    api: 'v2', // Versión de la API, si es necesario
-    collection: 'scl', // Colección, ajustar según el caso
-    begin_date: '2021-01', // Ejemplo de fecha de inicio
-    end_date: '2021-12', // Ejemplo de fecha de fin
+    fmt: 'json', 
+    api: 'v2', 
+    collection: 'scl', 
+    begin_date: '2021-01', 
+    end_date: '2021-12', 
   };
 
-  // Construir URL y parámetros según el tipo de búsqueda
+  
   switch (searchType) {
     case 'autor':
       url = 'https://usage.apis.scielo.org/reports/ir_a1';
-      params.author = query; // SciELO requiere este parámetro para autor
+      params.author = query; 
       break;
     case 'doi':
       url = 'https://usage.apis.scielo.org/reports/ir_a1';
-      params.pid = query; // SciELO permite buscar por PID para artículos
+      params.pid = query; 
       break;
     case 'nombre':
       url = 'https://usage.apis.scielo.org/reports/ir_a1';
-      params.title = query; // Suponiendo que la API permite 'title' (verificar en la doc.)
+      params.title = query; 
       break;
     default:
       return res.status(400).json({ error: 'Tipo de búsqueda no válido' });

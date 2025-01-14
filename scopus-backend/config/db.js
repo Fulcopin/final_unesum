@@ -1,5 +1,5 @@
-// backend/config/db.js
-require('dotenv').config(); // Carga las variables de entorno desde el archivo .env
+
+require('dotenv').config(); 
 const { Sequelize } = require('sequelize');
 
 // Crea una nueva instancia de Sequelize utilizando las variables de entorno
@@ -17,7 +17,7 @@ const sequelize = new Sequelize(
 
 // Autentica la conexión
 sequelize.authenticate()
-    .then(() => console.log('Conectado a la base de datos MySQL'))
-    .catch(err => console.error('Error al conectar a la base de datos:', err));
-
+    .then(() => console.log('Conectado a la base de datos MySQL')) 
+    .catch(err => console.error('Error al conectar a la base de datos:', err)); 
+    
 module.exports = sequelize;

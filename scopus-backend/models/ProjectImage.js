@@ -1,12 +1,16 @@
 // models/ProjectImage.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const ResearchProject = require('./ResearchProject');
+const ResearchProject = require('./researchProject');
 
 const ProjectImage = sequelize.define('ProjectImage', {
     path: {
         type: DataTypes.STRING,
         allowNull: false, // La ruta o URL de la imagen
+    },
+    filename: {
+        type: DataTypes.STRING,
+        allowNull: false, // El nombre del archivo
     },
     projectId: {
         type: DataTypes.INTEGER,

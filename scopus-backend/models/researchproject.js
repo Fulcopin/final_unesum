@@ -1,8 +1,15 @@
-// models/ResearchProject.js
+// filepath: /c:/Users/fupifigu/Videos/test_unesum/unesum-app-final/scopus-backend/models/researchproject.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const User = require('./User');
+
 
 const ResearchProject = sequelize.define('ResearchProject', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -15,10 +22,22 @@ const ResearchProject = sequelize.define('ResearchProject', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    period: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     score: {
         type: DataTypes.INTEGER,
-        defaultValue: 0, // Valor predeterminado de 0
+        defaultValue: 0,
         allowNull: false,
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: User,
+            key: 'id',
+        },
     },
 }, {
     tableName: 'researchprojects',
@@ -27,4 +46,6 @@ const ResearchProject = sequelize.define('ResearchProject', {
     updatedAt: 'updated_at',
 });
 
-module.exports = ResearchProject;
+module.exports =ResearchProject;
+
+

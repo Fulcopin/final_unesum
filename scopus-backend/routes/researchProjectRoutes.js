@@ -1,15 +1,12 @@
-// routes/researchProjectRoutes.js
-
 const express = require("express");
 const multer = require("multer");
 const researchProjectController = require("../controllers/researchProjectController");
 
 const router = express.Router();
 
-// Configuración de multer para guardar las imágenes en una carpeta específica
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/"); // Carpeta donde se guardarán las imágenes
+        cb(null, "uploads/");
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
@@ -19,7 +16,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Ruta para guardar el proyecto con múltiples imágenes
-router.post("/projects", upload.array("images"), researchProjectController.createProject);
+router.post("/projects", upload.fields([
+    { name: 'images', maxCount: 10 },
+    { name: 'acceptanceCertificate', maxCount: 1 },
+    { name: 'publicationCertificate', maxCount: 1 }
+]), researchProjectController.createProject);
 
 module.exports = router;

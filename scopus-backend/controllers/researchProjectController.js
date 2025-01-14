@@ -1,35 +1,97 @@
-// controllers/researchProjectController.js
-const ResearchProject = require('../models/ResearchProject');
+// filepath: /c:/Users/fupifigu/Videos/test_unesum/unesum-app-final/scopus-backend/controllers/researchProjectController.js
+const ResearchProject = require('../models/researchProject');
 const ProjectImage = require('../models/ProjectImage');
+const Document = require('../models/Document');
+const User = require('../models/User');
 const fs = require('fs');
 const path = require('path');
 
 exports.createProject = async (req, res) => {
-    const { name, description, type, score } = req.body;
-    const files = req.files; // Suponiendo que las imágenes se suben en files
+    const { name, description, type, period, participants, userId, documentDescription } = req.body;
+    const files = req.files.images || [];
+    const acceptanceCertificate = req.files.acceptanceCertificate ? req.files.acceptanceCertificate[0] : null;
+    const publicationCertificate = req.files.publicationCertificate ? req.files.publicationCertificate[0] : null;
 
     try {
-        // Crear el proyecto en la base de datos
-        const project = await ResearchProject.create({ name, description, type, score });
+        if (!userId) {
+            return res.status(400).json({ error: 'userId es requerido' });
+        }
 
-        // Guardar cada imagen en la base de datos con la ruta relativa
-        const imagePaths = [];
+        const project = await ResearchProject.create({ name, description, type, period, userId });
+
         for (const file of files) {
-            // Mover el archivo a la carpeta 'uploads' (ya realizado por multer)
             const imagePath = `uploads/${file.filename}`;
-
-            // Crear el registro de imagen en la base de datos
-            const image = await ProjectImage.create({
-                path: imagePath, // Ruta relativa de la imagen
+            await ProjectImage.create({
+                path: imagePath,
+                filename: file.originalname,
                 projectId: project.id,
             });
 
-            imagePaths.push(image.path);
+            await Document.create({
+                path: imagePath,
+                filename: file.originalname,
+                projectId: project.id,
+                userId: userId,
+                type: 'image',
+                description: documentDescription
+            });
         }
 
-        res.status(201).json({ project, images: imagePaths });
+        if (acceptanceCertificate) {
+            const acceptancePath = `uploads/${acceptanceCertificate.filename}`;
+            await Document.create({
+                path: acceptancePath,
+                filename: acceptanceCertificate.originalname,
+                projectId: project.id,
+                userId: userId,
+                type: 'acceptanceCertificate',
+                description: documentDescription
+            });
+        }
+
+        if (publicationCertificate) {
+            const publicationPath = `uploads/${publicationCertificate.filename}`;
+            await Document.create({
+                path: publicationPath,
+                filename: publicationCertificate.originalname,
+                projectId: project.id,
+                userId: userId,
+                type: 'publicationCertificate',
+                description: documentDescription
+            });
+        }
+
+        if (participants) {
+            const participantIds = JSON.parse(participants);
+            await project.addParticipants(participantIds);
+        }
+
+        const projectWithParticipants = await ResearchProject.findByPk(project.id, {
+            include: [{
+                model: User,
+                as: 'participants',
+                through: { attributes: [] }
+            }]
+        });
+
+        res.status(201).json({ project: projectWithParticipants });
     } catch (error) {
         console.error('Error al crear el proyecto:', error);
         res.status(500).json({ error: 'Error al crear el proyecto.' });
+    }
+};
+
+exports.getUsers = async (req, res) => {
+    try {
+        const users = await User.findAll({
+            attributes: ['id', 'username'] // Solo obtener 'id' y 'username'
+        });
+        res.json(users);
+    } catch (error) {
+        console.error('Error al obtener usuarios:', error); // Registro detallado del error
+        res.status(500).json({
+            success: false,
+            error: 'Error al obtener usuarios.'
+        });
     }
 };

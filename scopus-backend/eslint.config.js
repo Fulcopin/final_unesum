@@ -12,10 +12,10 @@ export default [
           __dirname: "readonly"
         }
       },
-      rules: {
-        "no-console": "warn",
-        "semi": ["error", "always"]
-      }
+     "rules": {
+  "no-console": ["warn", { "allow": ["warn", "error", "log"] }]
+}
+
     }
   ];
   
